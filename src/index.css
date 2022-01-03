@@ -12,3 +12,15 @@ input {
 td {
     border: 1px solid black;
 }
+
+.sudoku {
+    display: flex;
+    flex-direction: row;
+}
+
+.box {
+    height: 34px;
+    width: 34px;
+    border: 1px solid black;
+    background: white;
+}

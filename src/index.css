@@ -1,26 +1,37 @@
-table {
-    table-layout: fixed;
-    border-collapse: collapse;
+body {
+    margin: 20px;
 }
 
-input {
-    height: 34px;
-    width: 34px;
-    border: none;
-}
-
-td {
+.non-affected-box {
     border: 1px solid black;
+    background: white;
 }
 
-.sudoku {
-    display: flex;
-    flex-direction: row;
+.affected-box {
+    border: 1px solid black;
+    background: violet;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1ex solid black;
 }
 
 .box {
-    height: 34px;
-    width: 34px;
-    border: 1px solid black;
-    background: white;
+    background: transparent;
+    font-size: 1em;
+    border: none;
+    font-weight: bold;
+    line-height: calc(1ex * 5);
+    height: calc(1ex * 5);
+    text-align: center;
+    width: calc(1ex * 5);
+}
+
+.right-border {
+    border-right: 1ex solid black;
+}
+
+.bottom-border {
+    border-bottom: 1ex solid black;
 }

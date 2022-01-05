@@ -40,7 +40,7 @@ class SudokuBoard extends React.Component {
                 <table>
                     <tbody>
                     {
-                        this.props.boxes.map((row, i) =>
+                        this.props.state.boxes.map((row, i) =>
                             <tr key={i + "r"}>
                             {
                                 row.map((val, j) => {
@@ -62,8 +62,8 @@ class SudokuBoard extends React.Component {
                                     }
 
                                     return(
-                                        <td className={`box ${computedClass}`} key={`${i}${j}`} onClick={() => this.props.onClick(i, j)}>
-                                            {this.props.boxes[i][j]}
+                                        <td className={`box ${computedClass}`} key={`${i}${j}`} onClick={() => this.props.boxClick(i, j)}>
+                                            {this.props.state.boxes[i][j]}
                                         </td>
                                     )
                                 })
@@ -73,6 +73,16 @@ class SudokuBoard extends React.Component {
                     }
                     </tbody>
                 </table>
+                <div className='buttons-container'>
+                    {
+                        this.props.state.numbers.map((number, k) =>
+                            <button key={`${number}Button`} onClick={() => this.props.btnClick(k)}>
+                                {number}
+                            </button>
+                        )
+                    }
+                </div>
+
             </div>
         );
     }
@@ -83,26 +93,35 @@ class Sudoku extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // Sudoku has 81 boxes
-            boxes: Array(9).fill(Array(9).fill("")),
+            // Sudoku has 81 boxes, arrays are funny in this language
+            boxes: Array(9).fill().map(row => new Array(9).fill("")),
             selectedOuter: null,
             selectedInner: null,
+            numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
         }
     }
 
-    handleClick(i, j) {
+    boxClick(i, j) {
         this.setState({
             selectedOuter: i,
             selectedInner: j,
         });
     }
 
+    btnClick(k) {
+        let tmpBoxes = this.state.boxes;
+        tmpBoxes[this.state.selectedOuter][this.state.selectedInner] = this.state.numbers[k];
+        this.setState({
+            boxes: tmpBoxes,
+        })
+    }
+
     render() {
         return (
             <div>
                 <SudokuBoard
-                    boxes={this.state.boxes}
-                    onClick={(i, j) => this.handleClick(i, j)}
+                    boxClick={(i, j) => this.boxClick(i, j)}
+                    btnClick={(k) => this.btnClick(k)}
                     state={this.state}
                 />
             </div>

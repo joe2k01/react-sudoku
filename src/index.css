@@ -4,6 +4,7 @@ body {
 
 .sudoku-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -60,4 +61,16 @@ tr:nth-child(3n) {
         height: 8vw;
         width: 8vw;
     }
+}
+
+.buttons-container {
+    margin: 20px;
+}
+
+button {
+    font-size: 1em;
+    margin: 10px;
+    padding: 15px;
+    border: none;
+    border-radius: 30%;
 }

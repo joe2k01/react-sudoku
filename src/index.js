@@ -2,14 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-function Box(props) {
-    return (
-        <button className="box" onClick={props.onClick}>
-            {props.value}
-        </button>
-    );
-}
-
 class SudokuBoard extends React.Component {
     calculateBoundaries(inner, outer) {
         let innerUpBoundary = null;
@@ -44,54 +36,44 @@ class SudokuBoard extends React.Component {
     }
     render() {
         return (
-            <table>
-                <tbody>
-                {
-                    this.props.boxes.map((row, i) =>
-                        <tr key={i + "r"}>
-                        {
-                            row.map((val, j) => {
-                                let computedClass = "non-affected-box";
-                                const inner = this.props.state.selectedInner;
-                                const outer = this.props.state.selectedOuter;
-                                if(i === outer ||
-                                    j === inner) {
-                                        computedClass = "affected-box"
-                                }
-                                
-                                const [innerUpBoundary, innerLoBoundary, outerUpBoundary, outerLoBoundary] = this.calculateBoundaries(inner, outer);
-                                
-                                /* Affect the whole box */
-                                if(i <= outerUpBoundary && i >= outerLoBoundary && inner != null) {
-                                    if(j <= innerUpBoundary && j >= innerLoBoundary) {
-                                        computedClass = "affected-box"
+            <div className="sudoku-container">
+                <table>
+                    <tbody>
+                    {
+                        this.props.boxes.map((row, i) =>
+                            <tr key={i + "r"}>
+                            {
+                                row.map((val, j) => {
+                                    let computedClass = "non-affected-box";
+                                    const inner = this.props.state.selectedInner;
+                                    const outer = this.props.state.selectedOuter;
+                                    if(i === outer ||
+                                        j === inner) {
+                                            computedClass = "affected-box"
                                     }
-                                }
+                                    
+                                    const [innerUpBoundary, innerLoBoundary, outerUpBoundary, outerLoBoundary] = this.calculateBoundaries(inner, outer);
+                                    
+                                    /* Affect the whole box */
+                                    if(i <= outerUpBoundary && i >= outerLoBoundary && inner != null) {
+                                        if(j <= innerUpBoundary && j >= innerLoBoundary) {
+                                            computedClass = "affected-box"
+                                        }
+                                    }
 
-                                if (j === 2 /* Third column */ ||
-                                    j === 5 /* Sixth column */ ) {
-                                    computedClass = computedClass.concat(" right-border");
-                                }
-                                if (i === 2 /* Third row */ ||
-                                    i === 5 /* Sixth row */) {
-                                    computedClass = computedClass.concat(" bottom-border");
-                                }
-                                return(
-                                    <td className={computedClass} key={`${i}${j}`}>
-                                        <Box
-                                            value={this.props.boxes[i][j]}
-                                            onClick={() => this.props.onClick(i, j)}
-                                            key={`${i}${j}b`}
-                                        />
-                                    </td>
-                                )
-                            })
-                        }
-                        </tr>
-                    )
-                }
-                </tbody>
-            </table>
+                                    return(
+                                        <td className={`box ${computedClass}`} key={`${i}${j}`} onClick={() => this.props.onClick(i, j)}>
+                                            {this.props.boxes[i][j]}
+                                        </td>
+                                    )
+                                })
+                            }
+                            </tr>
+                        )
+                    }
+                    </tbody>
+                </table>
+            </div>
         );
     }
 }

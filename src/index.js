@@ -109,11 +109,13 @@ class Sudoku extends React.Component {
     }
 
     btnClick(k) {
-        let tmpBoxes = this.state.boxes;
-        tmpBoxes[this.state.selectedOuter][this.state.selectedInner] = this.state.numbers[k];
-        this.setState({
-            boxes: tmpBoxes,
-        })
+        if(this.state.selectedOuter != null) {
+            let tmpBoxes = this.state.boxes;
+            tmpBoxes[this.state.selectedOuter][this.state.selectedInner] = this.state.numbers[k];
+            this.setState({
+                boxes: tmpBoxes,
+            })
+        }
     }
 
     render() {

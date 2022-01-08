@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 class SudokuBoard extends React.Component {
+
     calculateBoundaries(inner, outer) {
         let innerUpBoundary = null;
         let innerLoBoundary = null;
@@ -34,6 +35,7 @@ class SudokuBoard extends React.Component {
         }
         return [innerUpBoundary, innerLoBoundary, outerUpBoundary, outerLoBoundary];
     }
+    
     render() {
         return (
             <div className="sudoku-container">
@@ -95,10 +97,12 @@ class Sudoku extends React.Component {
         this.state = {
             // Sudoku has 81 boxes, arrays are funny in this language
             boxes: Array(9).fill().map(row => new Array(9).fill("")),
+            solution: null,
             selectedOuter: null,
             selectedInner: null,
             numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
         }
+        this.populateSudoku();
     }
 
     boxClick(i, j) {
@@ -115,6 +119,42 @@ class Sudoku extends React.Component {
             this.setState({
                 boxes: tmpBoxes,
             })
+        }
+    }
+
+    populateSudoku() {
+        var solution = Array(9).fill().map(row => new Array(9).fill(""));
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                
+        // Shuffle array (Fisher-Yates algorithm)
+        solution[0] = numbers;
+        for(var i = 8; i > 0; i--) {
+            var randomN = Math.floor(Math.random() * (i + 1));
+
+            var tmp = solution[0][i];
+            solution[0][i] = solution[0][randomN];
+            solution[0][randomN] = tmp;
+        }
+
+        // Rotate by 3 next two rows, then rotate by 1. Repeat
+        for(var j = 1; j < 9; j++) {
+            solution[j] = solution[j - 1].slice();
+            // Device whether to rotate by 3 or one depending on row index.
+            var n = (j % 3 === 0) ? 1 : 3;
+            for(var k = 0; k < n; k++) {
+                solution[j].push(solution[j].shift());
+            }
+        }
+
+        // Assign solution
+        this.state.solution = solution;
+
+        // Give clues
+        for(var k = 0; k < 9; k++) {
+            for(var l = 0; l < 2; l++) {
+                let randomIndex = Math.trunc(Math.random() * 9);
+                this.state.boxes[k][randomIndex] = solution[k][randomIndex];
+            }
         }
     }
 

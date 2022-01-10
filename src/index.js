@@ -57,13 +57,13 @@ class SudokuBoard extends React.Component {
                                     const [innerUpBoundary, innerLoBoundary, outerUpBoundary, outerLoBoundary] = this.calculateBoundaries(inner, outer);
                                     
                                     /* Affect the whole box */
-                                    if(i <= outerUpBoundary && i >= outerLoBoundary && inner != null) {
+                                    if(i <= outerUpBoundary && i >= outerLoBoundary && inner !== null) {
                                         if(j <= innerUpBoundary && j >= innerLoBoundary) {
                                             computedClass = "affected-box"
                                         }
                                     }
 
-                                    if(this.props.state.boxes[i][j] != "" && this.props.state.boxes[i][j] != this.props.state.solution[i][j]) {
+                                    if(this.props.state.boxes[i][j] !== "" && this.props.state.boxes[i][j] !== this.props.state.solution[i][j]) {
                                         computedClass = computedClass.concat(" wrong");
                                     }
 
@@ -102,7 +102,7 @@ class Sudoku extends React.Component {
             // Sudoku has 81 boxes, arrays are funny in this language
             boxes: Array(9).fill().map(row => new Array(9).fill("")),
             solution: Array(9).fill().map(row => new Array(9).fill("")),
-            prohibitedIndexes: Array(9).fill().map(row => new Array(9).fill("")),
+            prohibitedIndexes: Array(9).fill().map(row => new Array(9).fill(false)),
             selectedOuter: null,
             selectedInner: null,
             numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -111,14 +111,21 @@ class Sudoku extends React.Component {
     }
 
     boxClick(i, j) {
-        this.setState({
-            selectedOuter: i,
-            selectedInner: j,
-        });
+        if(this.state.prohibitedIndexes[i][j]) {
+            this.setState({
+                selectedOuter: null,
+                selectedInner: null,
+            });
+        } else {
+            this.setState({
+                selectedOuter: i,
+                selectedInner: j,
+            });
+        }
     }
 
     btnClick(k) {
-        if(this.state.selectedOuter != null) {
+        if(this.state.selectedOuter !== null) {
             let tmpBoxes = this.state.boxes;
             tmpBoxes[this.state.selectedOuter][this.state.selectedInner] = this.state.numbers[k];
             this.setState({
@@ -166,7 +173,7 @@ class Sudoku extends React.Component {
                 this.state.boxes[k][randomIndex] = solution[k][randomIndex];
                 indexes.push(randomIndex);
                 usedIndex = randomIndex;
-                console.log(`randomIndex: ${randomIndex}`);
+                this.state.prohibitedIndexes[k][randomIndex] = true;
             }
         }
         let currentSymmIndex = 0;
@@ -174,8 +181,8 @@ class Sudoku extends React.Component {
             for(var n = 0; n < 2; n++) {
                 let index = 8 - indexes[currentSymmIndex];
                 this.state.boxes[m][index] = solution[m][index];
-                console.log(`index: ${index} n: ${n}`);
                 currentSymmIndex++;
+                this.state.prohibitedIndexes[m][index] = true;
             }
         }
     }

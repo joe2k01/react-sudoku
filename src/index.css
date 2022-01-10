@@ -16,7 +16,7 @@ body {
 
 .affected-box {
     border: 1px solid black;
-    background: violet;
+    background: #D1C4E9;
 }
 
 table {
@@ -31,6 +31,10 @@ table {
     text-align: center;
     height: 3vw;
     width: 3vw;
+}
+
+.wrong {
+    color: #D50000;
 }
 
 /* Thicker lines to divide 3x3 sudoku boxes*/

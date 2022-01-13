@@ -104,12 +104,13 @@ class Sudoku extends React.Component {
             // Sudoku has 81 boxes
             boxes: mSudoku.boxes,
             solution: mSudoku.solution,
-            prohibitedIndexes: Array(9).fill().map(row => new Array(9).fill(false)),
+            prohibitedIndexes: mSudoku.prohibitedIndexes,
             selectedOuter: null,
             selectedInner: null,
             numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             errors: 0,
         }
+        //console.log(this.state.prohibitedIndexes);
     }
 
     boxClick(i, j) {
@@ -172,6 +173,7 @@ class Sudoku extends React.Component {
         
         // Give symmetric clues
         let mBoxes = Array(9).fill().map(row => new Array(9).fill(""));
+        let mProhibitedIndexes = Array(9).fill().map(row => new Array(9).fill(false));
         for(let row = 0; row < 9; row++) {
             mBoxes[row] = mSolution[row].slice();
         }
@@ -188,6 +190,12 @@ class Sudoku extends React.Component {
                 mBoxes[l][randomIndex] = "";
                 mBoxes[8 - l][8 - randomIndex] = "";
             }
+            for(var o = 0; o < 9; o++) {
+                if(!usedIndexes.includes(o)) {
+                    mProhibitedIndexes[l][o] = true;
+                    mProhibitedIndexes[8 - l][8 - o] = true;
+                }
+            }
         }
 
         usedIndexes = [];
@@ -200,10 +208,16 @@ class Sudoku extends React.Component {
             usedIndexes.push(randomIndex);
             mBoxes[4][randomIndex] = "";
         }
+        for(var p = 0; p < 9; p++) {
+            if(!usedIndexes.includes(p)) {
+                mProhibitedIndexes[4][p] = true;
+            }
+        }
         
         return {
             'boxes': mBoxes,
-            'solution': mSolution
+            'solution': mSolution,
+            'prohibitedIndexes': mProhibitedIndexes
         };
     }
 

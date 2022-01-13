@@ -39,6 +39,7 @@ class SudokuBoard extends React.Component {
     render() {
         return (
             <div className="sudoku-container">
+                <h3>Errors: {this.props.state.errors}</h3>
                 <table>
                     <tbody>
                     {
@@ -63,7 +64,7 @@ class SudokuBoard extends React.Component {
                                         }
                                     }
 
-                                    if(this.props.state.boxes[i][j] !== "" && this.props.state.boxes[i][j] !== this.props.state.solution[i][j]) {
+                                    if((this.props.state.boxes[i][j] !== "") && (this.props.state.boxes[i][j] !== this.props.state.solution[i][j])) {
                                         computedClass = computedClass.concat(" wrong");
                                     }
 
@@ -98,16 +99,17 @@ class SudokuBoard extends React.Component {
 class Sudoku extends React.Component {
     constructor(props) {
         super(props);
+        let mSudoku = this.populateSudoku();
         this.state = {
-            // Sudoku has 81 boxes, arrays are funny in this language
-            boxes: Array(9).fill().map(row => new Array(9).fill("")),
-            solution: Array(9).fill().map(row => new Array(9).fill("")),
+            // Sudoku has 81 boxes
+            boxes: mSudoku.boxes,
+            solution: mSudoku.solution,
             prohibitedIndexes: Array(9).fill().map(row => new Array(9).fill(false)),
             selectedOuter: null,
             selectedInner: null,
             numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            errors: 0,
         }
-        this.populateSudoku();
     }
 
     boxClick(i, j) {
@@ -131,60 +133,78 @@ class Sudoku extends React.Component {
             this.setState({
                 boxes: tmpBoxes,
             })
+
+            let mErrors = this.state.errors;
+            if(this.state.numbers[k] !== this.state.solution[this.state.selectedOuter][this.state.selectedInner]) {
+                mErrors++;
+                this.setState({
+                    errors: mErrors,
+                })
+            }
         }
     }
 
     populateSudoku() {
-        let solution = this.state.solution;
+        let solution = Array(9).fill().map(row => new Array(9).fill(""));
+        let mSolution = Array(9).fill().map(row => new Array(9).fill(""));
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 
         // Shuffle array (Fisher-Yates algorithm)
-        solution[0] = numbers;
+        mSolution[0] = numbers;
         for(var i = 8; i > 0; i--) {
             var randomN = Math.floor(Math.random() * (i + 1));
 
-            var tmp = solution[0][i];
-            solution[0][i] = solution[0][randomN];
-            solution[0][randomN] = tmp;
+            let tmp = mSolution[0][i];
+            mSolution[0][i] = mSolution[0][randomN];
+            mSolution[0][randomN] = tmp;
         }
 
         // Rotate by 3 next two rows, then rotate by 1. Repeat
         for(var j = 1; j < 9; j++) {
-            solution[j] = solution[j - 1].slice();
-            // Device whether to rotate by 3 or one depending on row index.
-            var n = (j % 3 === 0) ? 1 : 3;
-            for(var k = 0; k < n; k++) {
-                solution[j].push(solution[j].shift());
+            mSolution[j] = mSolution[j - 1].slice();
+            // Decide whether to rotate by 3 or one depending on row index.
+            var rotation = (j % 3 === 0) ? 1 : 3;
+            for(var k = 0; k < rotation; k++) {
+                mSolution[j].push(mSolution[j].shift());
             }
         }
 
-        // Assign solution
-        this.state.solution = solution;
-
+        
         // Give symmetric clues
-        let indexes = [];
-        for(var k = 0; k < 5; k++) {
-            let usedIndex;
-            for(var l = 0; l < 2; l++) {
+        let mBoxes = Array(9).fill().map(row => new Array(9).fill(""));
+        for(let row = 0; row < 9; row++) {
+            mBoxes[row] = mSolution[row].slice();
+        }
+        let usedIndexes = [];
+        for(var l = 0; l < 4; l++) {
+            usedIndexes = [];
+            for(var m = 0; m < 5; m++) {
                 let randomIndex = Math.trunc(Math.random() * 9);
-                while(randomIndex === usedIndex) {
+                
+                while(usedIndexes.includes(randomIndex)) {
                     randomIndex = Math.trunc(Math.random() * 9);
                 }
-                this.state.boxes[k][randomIndex] = solution[k][randomIndex];
-                indexes.push(randomIndex);
-                usedIndex = randomIndex;
-                this.state.prohibitedIndexes[k][randomIndex] = true;
+                usedIndexes.push(randomIndex);
+                mBoxes[l][randomIndex] = "";
+                mBoxes[8 - l][8 - randomIndex] = "";
             }
         }
-        let currentSymmIndex = 0;
-        for(var m = 8; m > 4; m--) {
-            for(var n = 0; n < 2; n++) {
-                let index = 8 - indexes[currentSymmIndex];
-                this.state.boxes[m][index] = solution[m][index];
-                currentSymmIndex++;
-                this.state.prohibitedIndexes[m][index] = true;
+
+        usedIndexes = [];
+        for(var n = 0; n < 5; n++) {
+            let randomIndex = Math.trunc(Math.random() * 9);
+            
+            while(usedIndexes.includes(randomIndex)) {
+                randomIndex = Math.trunc(Math.random() * 9);
             }
+            usedIndexes.push(randomIndex);
+            mBoxes[4][randomIndex] = "";
         }
+        
+        return {
+            'boxes': mBoxes,
+            'solution': mSolution
+        };
     }
 
     render() {

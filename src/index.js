@@ -114,21 +114,14 @@ class Sudoku extends React.Component {
     }
 
     boxClick(i, j) {
-        if(this.state.prohibitedIndexes[i][j]) {
-            this.setState({
-                selectedOuter: null,
-                selectedInner: null,
-            });
-        } else {
-            this.setState({
-                selectedOuter: i,
-                selectedInner: j,
-            });
-        }
+        this.setState({
+            selectedOuter: i,
+            selectedInner: j,
+        });
     }
 
     btnClick(k) {
-        if(this.state.selectedOuter !== null) {
+        if(this.state.selectedOuter !== null && !this.state.prohibitedIndexes[this.state.selectedOuter][this.state.selectedInner]) {
             let tmpBoxes = this.state.boxes;
             tmpBoxes[this.state.selectedOuter][this.state.selectedInner] = this.state.numbers[k];
             this.setState({

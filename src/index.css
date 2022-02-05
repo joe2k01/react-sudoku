@@ -34,7 +34,11 @@ table {
 }
 
 .wrong {
-    color: #D50000;
+    color: #D50000 !important;
+}
+
+.user-input {
+    color: #1976D2;
 }
 
 /* Thicker lines to divide 3x3 sudoku boxes*/

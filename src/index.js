@@ -2,6 +2,43 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
+function Status(props) {
+    if(props.state.finished) {
+        return(
+            <h3>Finished sudoku with {props.state.errors} errors.</h3>
+        );
+    } else {
+        return(
+            <h3>Errors: {props.state.errors}</h3>
+        );
+    }
+}
+
+class Buttons extends React.Component {
+    render() {
+        if(this.props.state.finished) {
+            return(
+                <button key={`newGame`} onClick={() => this.props.newGame()}>
+                    Start a new game
+                </button>
+            )
+        } else {
+            return(
+                <div className='buttons-container'>
+                    {
+                        this.props.state.numbers.map((number, k) =>
+                            <button key={`${number}Button`} onClick={() => this.props.btnClick(k)}>
+                                {number}
+                            </button>
+                        )
+                    }
+                </div>
+            );
+        }
+    }
+}
+
 class SudokuBoard extends React.Component {
 
     calculateBoundaries(inner, outer) {
@@ -39,7 +76,9 @@ class SudokuBoard extends React.Component {
     render() {
         return (
             <div className="sudoku-container">
-                <h3>Errors: {this.props.state.errors}</h3>
+                <Status
+                    state={this.props.state}
+                />
                 <table>
                     <tbody>
                     {
@@ -64,6 +103,10 @@ class SudokuBoard extends React.Component {
                                         }
                                     }
 
+                                    if((!this.props.state.prohibitedIndexes[i][j])) {
+                                        computedClass = computedClass.concat(" user-input")
+                                    }
+
                                     if((this.props.state.boxes[i][j] !== "") && (this.props.state.boxes[i][j] !== this.props.state.solution[i][j])) {
                                         computedClass = computedClass.concat(" wrong");
                                     }
@@ -80,16 +123,11 @@ class SudokuBoard extends React.Component {
                     }
                     </tbody>
                 </table>
-                <div className='buttons-container'>
-                    {
-                        this.props.state.numbers.map((number, k) =>
-                            <button key={`${number}Button`} onClick={() => this.props.btnClick(k)}>
-                                {number}
-                            </button>
-                        )
-                    }
-                </div>
-
+                <Buttons
+                    state={this.props.state}
+                    btnClick={this.props.btnClick}
+                    newGame={this.props.newGame}
+                />
             </div>
         );
     }
@@ -109,8 +147,8 @@ class Sudoku extends React.Component {
             selectedInner: null,
             numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             errors: 0,
+            finished: false,
         }
-        //console.log(this.state.prohibitedIndexes);
     }
 
     boxClick(i, j) {
@@ -135,11 +173,24 @@ class Sudoku extends React.Component {
                     errors: mErrors,
                 })
             }
+
+            this.setState({
+                finished: true,
+            })
+            for(let i = 0; i < this.state.boxes.length; i++) {
+                for(let j = 0; j < 9; j++) { // 9 is items in a row
+                    if(this.state.boxes[i][j] !== this.state.solution[i][j]) {
+                        this.setState({
+                            finished: false,
+                        })
+                        break;
+                    }
+                }
+            }
         }
     }
 
     populateSudoku() {
-        let solution = Array(9).fill().map(row => new Array(9).fill(""));
         let mSolution = Array(9).fill().map(row => new Array(9).fill(""));
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                 
@@ -214,12 +265,27 @@ class Sudoku extends React.Component {
         };
     }
 
+    newGame() {
+        let mSudoku = this.populateSudoku();
+
+        this.setState({
+            boxes: mSudoku.boxes,
+            solution: mSudoku.solution,
+            prohibitedIndexes: mSudoku.prohibitedIndexes,
+            selectedOuter: null,
+            selectedInner: null,
+            errors: 0,
+            finished: false,
+        })
+    }
+
     render() {
         return (
             <div>
                 <SudokuBoard
                     boxClick={(i, j) => this.boxClick(i, j)}
                     btnClick={(k) => this.btnClick(k)}
+                    newGame={() => this.newGame()}
                     state={this.state}
                 />
             </div>
